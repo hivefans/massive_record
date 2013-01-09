@@ -3,11 +3,12 @@ module MassiveRecord
     module Thrift
       class Row
     
-        attr_accessor :id, :column_families, :columns, :new_record, :table
+        attr_accessor :id, :column_families, :columns, :new_record, :table ,:timestamp
     
         def initialize(opts = {})
           @id              = opts[:id]
           self.values      = opts[:values] || {}
+          @timestamp       = opts[:timestamp]
           @table           = opts[:table]
           @column_families = opts[:column_families] || []
           @columns         = opts[:columns] || {}
@@ -108,7 +109,10 @@ module MassiveRecord
             end
           end
 
+          if @timestamp.nil?
           @table.client.mutateRow(@table.name, id.to_s.dup.force_encoding(Encoding::BINARY), mutations).nil?
+          else
+          @table.client.mutateRowTs(@table.name, id.to_s.dup.force_encoding(Encoding::BINARY), mutations,@timestamp).nil?
         end
 
 
